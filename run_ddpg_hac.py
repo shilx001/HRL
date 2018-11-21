@@ -7,6 +7,7 @@ import gym
 import matplotlib.pyplot as plt
 import pickle
 
+#hyper parameters
 k = 4
 test = 0.5
 total_reward = []
@@ -63,8 +64,8 @@ for episode in range(300):
             cp_reward = get_reward(cp_next_state, meta_action)
             controller.store_transition(cp_state, cp_action, cp_reward, cp_next_state, meta_action)
             indices = np.random.choice(len(element), k)
-            for indices in indices:
-                sample_element = primitive_trajectory[indices]
+            for index in indices:
+                sample_element = primitive_trajectory[index]
                 sample_sate = sample_element[2]
                 sample_goal = sample_sate[0]
                 cp_reward = get_reward(cp_next_state, sample_goal)
@@ -87,8 +88,8 @@ for episode in range(300):
         cp_reward = get_reward(cp_next_state, meta_action)
         meta_controller.store_transition(cp_state, cp_action, cp_reward, cp_next_state, meta_action)
         indices = np.random.choice(len(element), k)
-        for indices in indices:
-            sample_element = meta_trajectory[indices]
+        for index in indices:
+            sample_element = meta_trajectory[index]
             sample_sate = sample_element[2]
             sample_goal = sample_sate[0]
             cp_reward = get_reward(cp_next_state, sample_goal)
