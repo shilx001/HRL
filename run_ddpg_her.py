@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import pickle
 
 
-def get_reward(state, goal):
+def get_reward(state, goal):#only for the continous mountain car problem.
     value = np.abs(state[0] - goal)
     if np.abs(value) == 0:
         return 0

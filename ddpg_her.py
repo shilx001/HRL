@@ -18,7 +18,7 @@ REPLAY_START = 1000
 ################## DDPG algorithm with Hindsight Experience Replay ##################
 
 class DDPG_HER(object):
-    def __init__(self, a_dim, s_dim, g_dim, a_bound):
+    def __init__(self, a_dim, s_dim, g_dim, a_bound,name_scope='default'):
         '''
         Initialization function
         :param a_dim: action dimension
@@ -26,19 +26,20 @@ class DDPG_HER(object):
         :param g_dim: goal dimension
         :param a_bound: the bound of actions
         '''
+        self.name_scope=name_scope
         self.memory = np.zeros((MEMORY_CAPACITY, s_dim * 2 + a_dim + 1 + g_dim), dtype=np.float64)
         self.pointer = 0
         self.sess = tf.Session()
         self.a_dim, self.s_dim, self.g_dim, self.a_bound = a_dim, s_dim, g_dim, a_bound
         self.replay_start = REPLAY_START
-        self.goal = tf.placeholder(tf.float64, [None, g_dim], name='Goal')
-        self.S = tf.placeholder(tf.float64, [None, s_dim], name='S')
-        self.S_ = tf.placeholder(tf.float64, [None, s_dim], name='S_')
-        self.R = tf.placeholder(tf.float64, [None, ], name='reward')
+        self.goal = tf.placeholder(tf.float64, [None, g_dim], name=self.name_scope+'Goal')
+        self.S = tf.placeholder(tf.float64, [None, s_dim], name=self.name_scope+'S')
+        self.S_ = tf.placeholder(tf.float64, [None, s_dim], name=self.name_scope+'S_')
+        self.R = tf.placeholder(tf.float64, [None, ], name=self.name_scope+'reward')
         self.a = self._build_a(self.S, self.goal)
         q = self._build_c(self.S, self.a, self.goal)
-        a_params = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope='Actor')
-        c_params = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope='Critic')
+        a_params = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope=self.name_scope+'Actor')
+        c_params = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope=self.name_scope+'Critic')
         ema = tf.train.ExponentialMovingAverage(decay=1 - TAU)
 
         def ema_getter(getter, name, *args, **kwargs):
@@ -90,7 +91,7 @@ class DDPG_HER(object):
 
     def _build_a(self, s, goal, reuse=None, custom_getter=None):  # 要加入对goal的输入
         trainable = True if reuse is None else False
-        with tf.variable_scope('Actor', reuse=reuse, custom_getter=custom_getter):
+        with tf.variable_scope(self.name_scope+'Actor', reuse=reuse, custom_getter=custom_getter):
             input_s = tf.reshape(s, [-1, self.s_dim])
             input_g = tf.reshape(goal, [-1, self.g_dim])
             input_all = tf.concat([input_s, input_g], axis=1)
@@ -100,7 +101,7 @@ class DDPG_HER(object):
 
     def _build_c(self, s, a, goal, reuse=None, custom_getter=None):
         trainable = True if reuse is None else False
-        with tf.variable_scope('Critic', reuse=reuse, custom_getter=custom_getter):
+        with tf.variable_scope(self.name_scope+'Critic', reuse=reuse, custom_getter=custom_getter):
             input_s = tf.reshape(s, [-1, self.s_dim])
             input_a = tf.reshape(a, [-1, self.a_dim])
             input_g = tf.reshape(goal, [-1, self.g_dim])
