@@ -63,7 +63,7 @@ for episode in range(300):
             cp_next_state = element[2]
             cp_reward = get_reward(cp_next_state, meta_action)
             controller.store_transition(cp_state, cp_action, cp_reward, cp_next_state, meta_action)
-            indices = np.random.choice(len(element), k)
+            indices = np.random.choice(len(primitive_trajectory), k)
             for index in indices:
                 sample_element = primitive_trajectory[index]
                 sample_sate = sample_element[2]
@@ -85,9 +85,9 @@ for episode in range(300):
         cp_state = element[0]
         cp_action = element[1]
         cp_next_state = element[2]
-        cp_reward = get_reward(cp_next_state, meta_action)
-        meta_controller.store_transition(cp_state, cp_action, cp_reward, cp_next_state, meta_action)
-        indices = np.random.choice(len(element), k)
+        cp_reward = get_reward(cp_next_state, goal)
+        meta_controller.store_transition(cp_state, cp_action, cp_reward, cp_next_state, goal)
+        indices = np.random.choice(len(meta_trajectory), k)
         for index in indices:
             sample_element = meta_trajectory[index]
             sample_sate = sample_element[2]
